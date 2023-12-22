@@ -1,23 +1,55 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using UrashimaValidation.CommonValidation;
 
 namespace UrashimaValidation
 {
     public class ValidationFactory<T>
     {
-        public static AbstractValidation<T> GetCreditCard(string validationType)
+        private static int _instanceNumber = 0;
+
+        public static int InstanceNumber
         {
-            switch (validationType.ToLower())
+            get
             {
-                case "attribute":
-                    return new Validation<T>();
-                case "customAttribute":
-                    return new Titanium();
+                return _instanceNumber;
+            }
+            private set
+            {
+                _instanceNumber = value;
+            }
+        }
+
+        public static IValidation<T> CreateValidation(string validationType, Func<T, object> value, Func<T, bool>? validationFunc = null, string? errorMessage = null, IValidation<T>? baseValidation = null)
+        {
+            switch (validationType)
+            {
+                case "Validation":
+                    InstanceNumber++;
+                    return new Validation<T>(
+                        messageOnError: string.IsNullOrEmpty(errorMessage) ? "Validation #" + InstanceNumber + ": This field do not match the validation" : errorMessage,
+                        name: "Validation from factory: " + InstanceNumber,
+                        originalValue: value,
+                        validationFunction: validationFunc
+                    );
+
+                case "EmailValidation":
+                    InstanceNumber++;
+                    return new EmailValidation<T>(
+                        messageOnError: string.IsNullOrEmpty(errorMessage) ? "Email validation #" + InstanceNumber + ": This field is not an email" : errorMessage,
+                        name: "Email validation from factory: " + InstanceNumber,
+                        originalValue: value,
+                        baseValidation
+                    );
+
+                case "NotEmptyValidation":
+                    InstanceNumber++;
+                    return new NotEmptyValidation<T>(
+                        messageOnError: string.IsNullOrEmpty(errorMessage) ? "Not empty validation #" + InstanceNumber + ": This field cannot be empty" : errorMessage,
+                        name: "Not empty validation from factory: " + InstanceNumber,
+                        originalValue: value,
+                        baseValidation
+                    );
                 default:
-                    throw new ArgumentException("Invalid credit card type");
+                    throw new ArgumentException("Invalid validation type");
             }
         }
     }

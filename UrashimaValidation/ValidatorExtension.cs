@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace UrashimaValidation
 {
@@ -49,7 +45,7 @@ namespace UrashimaValidation
         }
 
         /// <summary>
-        /// Adds a new <see cref="AbstractValidation{T}"/> to the <see cref="Validator{T}" />
+        /// Adds a new <see cref="IValidation{T}"/> to the <see cref="Validator{T}" />
         /// </summary>
         /// <typeparam name="T">The Type to validate</typeparam>
         /// <param name="validator">The validator</param>
@@ -58,7 +54,7 @@ namespace UrashimaValidation
         /// <exception cref="InvalidOperationException">Occurs if the instance of <see cref="Validator{T}"/> is null</exception>
         public static Validator<T> Add<T>(
             this Validator<T> validator,
-            AbstractValidation<T> validation)
+            IValidation<T> validation)
         {
             if (validator == null)
             {
@@ -71,7 +67,7 @@ namespace UrashimaValidation
         }
 
         /// <summary>
-        /// Adds a <see cref="IEnumerable{AbstractValidation}"/> to the <see cref="Validator{T}" />
+        /// Adds a <see cref="IEnumerable{IValidation}"/> to the <see cref="Validator{T}" />
         /// </summary>
         /// <typeparam name="T">The Type to validate</typeparam>
         /// <param name="validator">The validator</param>
@@ -80,7 +76,7 @@ namespace UrashimaValidation
         /// <exception cref="InvalidOperationException">Occurs if the instance of <see cref="Validator{T}"/> is null</exception>
         public static Validator<T> Add<T>(
             this Validator<T> validator,
-            IEnumerable<AbstractValidation<T>> validations)
+            IEnumerable<IValidation<T>> validations)
         {
             if (validator == null)
             {
@@ -117,7 +113,6 @@ namespace UrashimaValidation
                 {
                     validator.AddValidation(new Validation<T>(
                         messageOnError: string.IsNullOrEmpty(attribute.ErrorMessage) ? validator.GetAttributeValidationMessage(attribute.GetType().Name + " failed") : validator.GetAttributeValidationMessage(attribute.ErrorMessage),
-                        messageOnSuccess: "",
                         name: validator.GetAttributeValidationMessage(property.Name + ", Attribute name: " + attribute.GetType().Name),
                         originalValue: obj => property.GetValue(obj),
                         validationFunction: obj => attribute.IsValid(property.GetValue(obj)))

@@ -1,22 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace UrashimaValidation
+﻿namespace UrashimaValidation
 {
-    public class Validation<T> : AbstractValidation<T>
+    public class Validation<T> : IValidation<T>
     {
         private string _messageOnError;
-        private readonly string _messageOnSuccess;
         private readonly string _name;
         private readonly Func<T, object> _originalValue;
         private readonly Func<T, bool> _validationFunction;
 
         public Validation(
             string messageOnError,
-            string messageOnSuccess,
             string name,
             Func<T, object> originalValue,
             Func<T, bool> validationFunction)
@@ -36,7 +28,6 @@ namespace UrashimaValidation
             }
 
             _messageOnError = messageOnError;
-            _messageOnSuccess = messageOnSuccess;
             _name = name;
             _originalValue = originalValue;
             _validationFunction = validationFunction ?? throw new ArgumentNullException(
@@ -45,7 +36,8 @@ namespace UrashimaValidation
         }
 
         /// <inheritdoc />
-        public override string MessageOnError  {
+        public virtual string MessageOnError
+        {
             get
             {
                 return _messageOnError;
@@ -57,15 +49,30 @@ namespace UrashimaValidation
         }
 
         /// <inheritdoc />
-        public override string MessageOnSuccess => _messageOnSuccess;
+        public string Name => _name;
 
         /// <inheritdoc />
-        public override string Name => _name;
+        public virtual Func<T, object> OriginalValue => _originalValue;
 
         /// <inheritdoc />
-        public override Func<T, object> OriginalValue => _originalValue;
+        public virtual Func<T, bool> ValidationFunction => _validationFunction;
 
-        /// <inheritdoc />
-        public override Func<T, bool> ValidationFunction => _validationFunction;
+        public virtual bool IsValid(T value) => ValidationFunction(value);
+
+        public bool IsBaseSuccess(IValidation<T>? baseValidation, T value)
+        {
+            if (baseValidation != null && !baseValidation.IsValid(value))
+            {
+                MessageOnError += "\n" + baseValidation.MessageOnError;
+                return false;
+            }
+
+            return true;
+        }
+
+        public override string ToString()
+        {
+            return $"Name: {Name}";
+        }
     }
 }

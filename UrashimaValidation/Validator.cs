@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace UrashimaValidation
 {
     public class Validator<T> : IValidator<T>
     {
 
-        private readonly List<AbstractValidation<T>> _validations = new List<AbstractValidation<T>>();
+        private readonly List<IValidation<T>> _validations = new List<IValidation<T>>();
 
 
         #region SINGLETON
@@ -31,7 +33,7 @@ namespace UrashimaValidation
         #endregion
 
         /// <inheritdoc />
-        public IReadOnlyCollection<AbstractValidation<T>> Validations => _validations.AsReadOnly();
+        public IReadOnlyCollection<IValidation<T>> Validations => _validations.AsReadOnly();
 
         /// <inheritdoc />
         public bool ReturnOnlyErrors { get; set; } = false;
@@ -54,7 +56,7 @@ namespace UrashimaValidation
             T value,
             string? nameFilter = null)
         {
-            Func<AbstractValidation<T>, bool>? wherePredicate = null;
+            Func<IValidation<T>, bool>? wherePredicate = null;
 
             if (!string.IsNullOrEmpty(nameFilter))
             {
@@ -83,18 +85,18 @@ namespace UrashimaValidation
         /// <inheritdoc />
         public IEnumerable<ValidationResponse> ValidateWithFilter(
             T value,
-            Func<AbstractValidation<T>, bool>? wherePredicate = null)
+            Func<IValidation<T>, bool>? wherePredicate = null)
         {
-            wherePredicate = wherePredicate ?? new Func<AbstractValidation<T>, bool>((i) => true);
+            wherePredicate = wherePredicate ?? new Func<IValidation<T>, bool>((i) => true);
 
             return ValidateWithCachingDisabled(value: value, wherePredicate: wherePredicate);
         }
 
         private IEnumerable<ValidationResponse> ValidateWithCachingDisabled(
             T value,
-            Func<AbstractValidation<T>, bool> wherePredicate)
+            Func<IValidation<T>, bool> wherePredicate)
         {
-            foreach (AbstractValidation<T> validation in Validations.Where(predicate: wherePredicate))
+            foreach (IValidation<T> validation in Validations.Where(predicate: wherePredicate))
             {
                 bool valid = validation.IsValid(value);
 
@@ -109,7 +111,7 @@ namespace UrashimaValidation
         }
 
         /// <inheritdoc />
-        public void AddValidation(AbstractValidation<T> validation)
+        public void AddValidation(IValidation<T> validation)
         {
             if (!Validations.Any(a => a.Name == validation.Name))
             {
@@ -118,9 +120,9 @@ namespace UrashimaValidation
         }
 
         /// <inheritdoc />
-        public void AddValidation(IEnumerable<AbstractValidation<T>> validations)
+        public void AddValidation(IEnumerable<IValidation<T>> validations)
         {
-            foreach (AbstractValidation<T> validation in validations)
+            foreach (IValidation<T> validation in validations)
             {
                 AddValidation(validation: validation);
             }
@@ -134,14 +136,37 @@ namespace UrashimaValidation
 
         private ValidationResponse CreateValidationResponse(
             bool valid,
-            AbstractValidation<T> validation,
+            IValidation<T> validation,
             T value)
         {
             return new ValidationResponse(
                 type: valid ? ValidationResponseType.Success : ValidationResponseType.Error,
                 name: validation.Name,
-                message: valid ? validation.MessageOnSuccess : validation.MessageOnError,
+                message: validation.MessageOnError,
                 originalValue: validation.OriginalValue(arg: value));
+        }
+
+        public void AddAttributeValidation2(T obj)
+        {
+            Type type = obj.GetType();
+
+            // Loop through all properties of the class
+            foreach (PropertyInfo property in type.GetProperties())
+            {
+                // Get the custom attributes for the property
+                object[] attributes = property.GetCustomAttributes(true);
+
+                // Loop through the attributes
+                foreach (ValidationAttribute attribute in attributes)
+                {
+                    AddValidation(new Validation<T>(
+                        messageOnError: attribute.ErrorMessage,
+                        name: "Attribute validation of " + property.Name + ", Attribute name: " + attribute.GetHashCode(),
+                        originalValue: obj => obj,
+                        validationFunction: obj => attribute.IsValid(property.GetValue(obj)))
+                        );
+                }
+            }
         }
 
         public string GetAttributeValidationMessage(string errorMessage)
