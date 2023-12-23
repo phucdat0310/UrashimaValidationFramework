@@ -74,5 +74,17 @@
         {
             return $"Name: {Name}";
         }
+
+        IEnumerable<ValidationResponse> IValidation<T>.Validate(T value)
+        {
+            return new List<ValidationResponse>()
+            {
+                new ValidationResponse(
+                type: IsValid(value) ? ValidationResponseType.Success : ValidationResponseType.Error,
+                name: Name,
+                message: MessageOnError,
+                originalValue: OriginalValue(arg: value))
+            };
+        }
     }
 }

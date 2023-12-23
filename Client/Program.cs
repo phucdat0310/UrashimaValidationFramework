@@ -13,17 +13,16 @@ List<IValidation<Customer>> list = new List<IValidation<Customer>>
 {
     #region DECORATOR
     // pass a base validation to the "Not Empty" validation
+    ValidationFactory<Customer>.CreateValidation("EmailValidation", item => item.Email, baseValidation: emailCombineValidation)
     
     #endregion
-    ValidationFactory<Customer>.CreateValidation("EmailValidation", item => item.Email, baseValidation: emailCombineValidation)
 };
 
 Validator<Customer> validator = Validator<Customer>.GetInstance()!
     .AddAttributeValidation()
-    .EnableReturnOnlyErrors()
     .Add(validations: list);
 
-var response = validator.ValidateSingleValue(customer);
+var response = validator.ValidateSingleValueComposite(customer);
 
 foreach (var item in response)
 {

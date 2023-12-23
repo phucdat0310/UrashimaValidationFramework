@@ -12,9 +12,10 @@ namespace UrashimaValidation
 {
     public class Validator<T> : IValidator<T>
     {
-
+        #region COMPOSITE
         private readonly List<IValidation<T>> _validations = new List<IValidation<T>>();
-
+        private readonly IValidation<T> _validationComposite;
+        #endregion
 
         #region SINGLETON
         private Validator()
@@ -34,6 +35,19 @@ namespace UrashimaValidation
 
         /// <inheritdoc />
         public IReadOnlyCollection<IValidation<T>> Validations => _validations.AsReadOnly();
+
+        public IValidation<T> ValidationComposite
+        {
+            get
+            {
+                if (_validationComposite == null)
+                {
+                    return new ValidationComposite<T>(_validations);
+                }
+
+                return _validationComposite;
+            }
+        }
 
         /// <inheritdoc />
         public bool ReturnOnlyErrors { get; set; } = false;
@@ -110,6 +124,12 @@ namespace UrashimaValidation
             }
         }
 
+        public bool IsAllValid(T value)
+        => ValidationComposite.IsValid(value);
+
+        public IEnumerable<ValidationResponse> ValidateSingleValueComposite(T value)
+        => ValidationComposite.Validate(value);
+
         /// <inheritdoc />
         public void AddValidation(IValidation<T> validation)
         {
@@ -144,29 +164,6 @@ namespace UrashimaValidation
                 name: validation.Name,
                 message: validation.MessageOnError,
                 originalValue: validation.OriginalValue(arg: value));
-        }
-
-        public void AddAttributeValidation2(T obj)
-        {
-            Type type = obj.GetType();
-
-            // Loop through all properties of the class
-            foreach (PropertyInfo property in type.GetProperties())
-            {
-                // Get the custom attributes for the property
-                object[] attributes = property.GetCustomAttributes(true);
-
-                // Loop through the attributes
-                foreach (ValidationAttribute attribute in attributes)
-                {
-                    AddValidation(new Validation<T>(
-                        messageOnError: attribute.ErrorMessage,
-                        name: "Attribute validation of " + property.Name + ", Attribute name: " + attribute.GetHashCode(),
-                        originalValue: obj => obj,
-                        validationFunction: obj => attribute.IsValid(property.GetValue(obj)))
-                        );
-                }
-            }
         }
 
         public string GetAttributeValidationMessage(string errorMessage)

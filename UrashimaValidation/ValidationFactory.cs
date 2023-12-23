@@ -18,6 +18,7 @@ namespace UrashimaValidation
             }
         }
 
+        #region FACTORY
         public static IValidation<T> CreateValidation(string validationType, Func<T, object> value, Func<T, bool>? validationFunc = null, string? errorMessage = null, IValidation<T>? baseValidation = null)
         {
             switch (validationType)
@@ -52,5 +53,6 @@ namespace UrashimaValidation
                     throw new ArgumentException("Invalid validation type");
             }
         }
+        #endregion
     }
 }

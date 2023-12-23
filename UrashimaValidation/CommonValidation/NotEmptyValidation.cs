@@ -2,6 +2,7 @@
 {
     public class NotEmptyValidation<T> : Validation<T>
     {
+        #region DEPENDENCY INJECTION
         private IValidation<T>? _baseValidation;
 
         public NotEmptyValidation(Func<T, object> originalValue, IValidation<T>? baseValidation = null)
@@ -12,6 +13,7 @@
         {
             _baseValidation = baseValidation;
         }
+        #endregion
 
         public NotEmptyValidation(string messageOnError, string name, Func<T, object> originalValue, IValidation<T>? baseValidation = null)
             : base(messageOnError, name, originalValue, obj => !string.IsNullOrEmpty(originalValue(obj).ToString()))

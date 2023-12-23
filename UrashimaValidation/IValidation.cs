@@ -10,6 +10,8 @@
 
         public Func<T, object> OriginalValue { get; }
 
-        public virtual bool IsValid(T value) => ValidationFunction(arg: value);
+        public bool IsValid(T value) => ValidationFunction(arg: value);
+
+        public IEnumerable<ValidationResponse> Validate(T value);
     }
 }

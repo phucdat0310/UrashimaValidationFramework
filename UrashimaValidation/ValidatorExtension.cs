@@ -7,44 +7,6 @@ namespace UrashimaValidation
     public static class ValidatorExtension
     {
         /// <summary>
-        /// Only Errors are returning if validating is called />
-        /// </summary>
-        /// <typeparam name="T">The Type to validate</typeparam>
-        /// <param name="validator">The validator</param>
-        /// <returns>Returns the Instance of <see cref="Validator{T}"/> with <see cref="Validator{T}.ReturnOnlyErrors"/> set on true</returns>
-        /// <exception cref="InvalidOperationException">Occurs if the instance of <see cref="Validator{T}"/> is null</exception>
-        public static Validator<T> EnableReturnOnlyErrors<T>(this Validator<T> validator)
-        {
-            if (validator == null)
-            {
-                throw new InvalidOperationException(message: "Validator is null");
-            }
-
-            validator.ReturnOnlyErrors = true;
-
-            return validator;
-        }
-
-        /// <summary>
-        /// All items are returning if validating is called />
-        /// </summary>
-        /// <typeparam name="T">The Type to validate</typeparam>
-        /// <param name="validator">The validator</param>
-        /// <returns>Returns the Instance of <see cref="Validator{T}"/> with <see cref="Validator{T}.ReturnOnlyErrors"/> set on false</returns>
-        /// <exception cref="InvalidOperationException">Occurs if the instance of <see cref="Validator{T}"/> is null</exception>
-        public static Validator<T> DisableReturnOnlyErrors<T>(this Validator<T> validator)
-        {
-            if (validator == null)
-            {
-                throw new InvalidOperationException(message: "Validator is null");
-            }
-
-            validator.ReturnOnlyErrors = false;
-
-            return validator;
-        }
-
-        /// <summary>
         /// Adds a new <see cref="IValidation{T}"/> to the <see cref="Validator{T}" />
         /// </summary>
         /// <typeparam name="T">The Type to validate</typeparam>
@@ -98,6 +60,12 @@ namespace UrashimaValidation
             return validationResponse.All((val) => val.Type != ValidationResponseType.Error);
         }
 
+        /// <summary>
+        /// Convert attributes to validations
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="validator"></param>
+        /// <returns></returns>
         public static Validator<T> AddAttributeValidation<T>(this Validator<T> validator)
         {
             Type type = typeof(T);
@@ -114,7 +82,7 @@ namespace UrashimaValidation
                     validator.AddValidation(new Validation<T>(
                         messageOnError: string.IsNullOrEmpty(attribute.ErrorMessage) ? validator.GetAttributeValidationMessage(attribute.GetType().Name + " failed") : validator.GetAttributeValidationMessage(attribute.ErrorMessage),
                         name: validator.GetAttributeValidationMessage(property.Name + ", Attribute name: " + attribute.GetType().Name),
-                        originalValue: obj => property.GetValue(obj),
+                        originalValue: obj => property.GetValue(obj)!,
                         validationFunction: obj => attribute.IsValid(property.GetValue(obj)))
                     );
                 }

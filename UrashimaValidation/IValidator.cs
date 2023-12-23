@@ -2,6 +2,7 @@
 {
     public interface IValidator<T>
     {
+        IValidation<T> ValidationComposite { get; }
         IReadOnlyCollection<IValidation<T>> Validations { get; }
         void AddValidation(IValidation<T> validation);
         void AddValidation(IEnumerable<IValidation<T>> validations);
