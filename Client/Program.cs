@@ -13,8 +13,8 @@ List<IValidation<Customer>> list = new List<IValidation<Customer>>
 {
     #region DECORATOR
     // pass a base validation to the "Not Empty" validation
-    ValidationFactory<Customer>.CreateValidation("EmailValidation", item => item.Email, baseValidation: emailCombineValidation)
-    
+    ValidationFactory<Customer>.CreateValidation("EmailValidation", item => item.Email, baseValidation: emailCombineValidation),
+    ValidationFactory<Customer>.CreateRegexValidation(item => item.Email, pattern: @"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$", errorMessage: "Password is WEAK!")
     #endregion
 };
 

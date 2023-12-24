@@ -49,10 +49,24 @@ namespace UrashimaValidation
                         originalValue: value,
                         baseValidation
                     );
+                
                 default:
                     throw new ArgumentException("Invalid validation type");
             }
         }
+
+        public static IValidation<T> CreateRegexValidation(Func<T, object> value, string pattern, string? errorMessage = null, IValidation<T>? baseValidation = null)
+        {
+            InstanceNumber++;
+            return new RegexValidation<T>(
+                messageOnError: string.IsNullOrEmpty(errorMessage) ? "Regex validation #" + InstanceNumber + ": The value is not match for pattern provided" : errorMessage,
+                name: "Regex validation from factory: " + InstanceNumber,
+                originalValue: value,
+                pattern: pattern,
+                baseValidation
+            );
+        }
+
         #endregion
     }
 }

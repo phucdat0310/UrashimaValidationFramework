@@ -35,7 +35,6 @@
                 paramName: nameof(validationFunction));
         }
 
-        /// <inheritdoc />
         public virtual string MessageOnError
         {
             get
@@ -48,13 +47,10 @@
             }
         }
 
-        /// <inheritdoc />
         public string Name => _name;
 
-        /// <inheritdoc />
         public virtual Func<T, object> OriginalValue => _originalValue;
 
-        /// <inheritdoc />
         public virtual Func<T, bool> ValidationFunction => _validationFunction;
 
         public virtual bool IsValid(T value) => ValidationFunction(value);

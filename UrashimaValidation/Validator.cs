@@ -33,7 +33,7 @@ namespace UrashimaValidation
         }
         #endregion
 
-        /// <inheritdoc />
+        
         public IReadOnlyCollection<IValidation<T>> Validations => _validations.AsReadOnly();
 
         public IValidation<T> ValidationComposite
@@ -49,15 +49,11 @@ namespace UrashimaValidation
             }
         }
 
-        /// <inheritdoc />
+        
         public bool ReturnOnlyErrors { get; set; } = false;
 
-        /// <summary>
-        /// The internal cache
-        /// </summary>
         protected Dictionary<string, bool> Cache { get; set; } = new Dictionary<string, bool>();
 
-        /// <inheritdoc />
         public IEnumerable<ValidationResponse> ValidateSingleValue(T value)
         {
             return ValidateWithFilter(
@@ -65,7 +61,6 @@ namespace UrashimaValidation
                 wherePredicate: null);
         }
 
-        /// <inheritdoc />
         public IEnumerable<ValidationResponse> ValidateWithNameFilter(
             T value,
             string? nameFilter = null)
@@ -82,7 +77,6 @@ namespace UrashimaValidation
                 wherePredicate: wherePredicate);
         }
 
-        /// <inheritdoc />
         public IEnumerable<ValidationResponse> ValidateList(IEnumerable<T> values)
         {
             foreach (T value in values)
@@ -96,7 +90,6 @@ namespace UrashimaValidation
             }
         }
 
-        /// <inheritdoc />
         public IEnumerable<ValidationResponse> ValidateWithFilter(
             T value,
             Func<IValidation<T>, bool>? wherePredicate = null)
@@ -130,7 +123,6 @@ namespace UrashimaValidation
         public IEnumerable<ValidationResponse> ValidateSingleValueComposite(T value)
         => ValidationComposite.Validate(value);
 
-        /// <inheritdoc />
         public void AddValidation(IValidation<T> validation)
         {
             if (!Validations.Any(a => a.Name == validation.Name))
@@ -139,7 +131,6 @@ namespace UrashimaValidation
             }
         }
 
-        /// <inheritdoc />
         public void AddValidation(IEnumerable<IValidation<T>> validations)
         {
             foreach (IValidation<T> validation in validations)
@@ -148,7 +139,6 @@ namespace UrashimaValidation
             }
         }
 
-        /// <inheritdoc />
         public void ClearValidations()
         {
             _validations.Clear();
