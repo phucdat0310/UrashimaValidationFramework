@@ -27,6 +27,5 @@ namespace UrashimaValidation.Functions
         {
             return value >= start && value <= end;
         }
-
     }
 }

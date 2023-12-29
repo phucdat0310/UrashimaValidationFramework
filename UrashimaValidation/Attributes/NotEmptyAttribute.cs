@@ -16,5 +16,7 @@ namespace UrashimaValidation.Attributes
         {
             Description = description;
         }
+
+        
     }
 }
