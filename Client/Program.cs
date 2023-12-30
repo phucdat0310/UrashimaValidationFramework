@@ -7,15 +7,15 @@ var customer = new Customer();
 var validation = ValidationFactory<Customer>.CreateValidation(item => item.Name, (customer) => customer.Name.Length > 6, "Name length must be greater than 6");
 
 #region DECORATOR
-var emailCombineValidation = ValidationFactory<Customer>.CreateNotEmptyValidation(
-        item => item.Name,
-        baseValidation: validation);
+var emailCombineValidation = new NotEmptyValidationFactory<Customer>().Create(
+    item => item.Name,
+    baseValidation: validation);
 #endregion
 
 List<IValidation<Customer>> list = new List<IValidation<Customer>>
 {
     // pass a base validation to the "Not Empty" validation
-    ValidationFactory<Customer>.CreateEmailValidation(item => item.Email, baseValidation: emailCombineValidation),
+    new EmailValidationFactory<Customer>().Create(item => item.Email, baseValidation: emailCombineValidation),
     ValidationFactory<Customer>.CreateRegexValidation(item => item.Email, pattern: @"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$", errorMessage: "Password is WEAK!")
 };
 

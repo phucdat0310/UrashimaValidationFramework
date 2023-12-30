@@ -2,6 +2,151 @@
 
 namespace UrashimaValidation
 {
+    public interface IValidationFactory<T>
+    {
+        public IValidation<T> Create(Func<T, object> value, string? errorMessage = null, IValidation<T>? baseValidation = null);
+    }
+
+    public class EmailValidationFactory<T> : IValidationFactory<T>
+    {
+        private static int _instanceNumber = 0;
+
+        public static int InstanceNumber
+        {
+            get
+            {
+                return _instanceNumber;
+            }
+            private set
+            {
+                _instanceNumber = value;
+            }
+        }
+
+        public IValidation<T> Create(Func<T, object> value, string? errorMessage = null, IValidation<T>? baseValidation = null)
+        {
+            InstanceNumber++;
+            return new EmailValidation<T>(
+                messageOnError: string.IsNullOrEmpty(errorMessage) ? "Email validation #" + InstanceNumber + ": This field is not an email" : errorMessage,
+                name: "Email validation from factory: " + InstanceNumber,
+                originalValue: value,
+                baseValidation
+            );
+        }
+    }
+
+    public class NotEmptyValidationFactory<T> : IValidationFactory<T>
+    {
+        private static int _instanceNumber = 0;
+
+        public static int InstanceNumber
+        {
+            get
+            {
+                return _instanceNumber;
+            }
+            private set
+            {
+                _instanceNumber = value;
+            }
+        }
+
+        public IValidation<T> Create(Func<T, object> value, string? errorMessage = null, IValidation<T>? baseValidation = null)
+        {
+            InstanceNumber++;
+            return new NotEmptyValidation<T>(
+                messageOnError: string.IsNullOrEmpty(errorMessage) ? "Not empty validation #" + InstanceNumber + ": This field cannot be empty" : errorMessage,
+                name: "Not empty validation from factory: " + InstanceNumber,
+                originalValue: value,
+                baseValidation
+            );
+        }
+    }
+
+    public class IPV4ValidationFactory<T> : IValidationFactory<T>
+    {
+        private static int _instanceNumber = 0;
+
+        public static int InstanceNumber
+        {
+            get
+            {
+                return _instanceNumber;
+            }
+            private set
+            {
+                _instanceNumber = value;
+            }
+        }
+
+        public IValidation<T> Create(Func<T, object> value, string? errorMessage = null, IValidation<T>? baseValidation = null)
+        {
+            InstanceNumber++;
+            return new IPv4Validation<T>(
+                messageOnError: string.IsNullOrEmpty(errorMessage) ? "IPv4 validation #" + InstanceNumber + ": This field is not an IPv4 Address" : errorMessage,
+                name: "IPv4 validation from factory: " + InstanceNumber,
+                originalValue: value,
+                baseValidation
+            );
+        }
+    }
+
+    public class IPv6ValidationFactory<T> : IValidationFactory<T>
+    {
+        private static int _instanceNumber = 0;
+
+        public static int InstanceNumber
+        {
+            get
+            {
+                return _instanceNumber;
+            }
+            private set
+            {
+                _instanceNumber = value;
+            }
+        }
+
+        public IValidation<T> Create(Func<T, object> value, string? errorMessage = null, IValidation<T>? baseValidation = null)
+        {
+            InstanceNumber++;
+            return new IPv6Validation<T>(
+                messageOnError: string.IsNullOrEmpty(errorMessage) ? "IPv6 validation #" + InstanceNumber + ": This field is not an IPv6 Address" : errorMessage,
+                name: "IPv6 validation from factory: " + InstanceNumber,
+                originalValue: value,
+                baseValidation
+            );
+        }
+    }
+
+    public class IsTodayValidationFactory<T> : IValidationFactory<T>
+    {
+        private static int _instanceNumber = 0;
+
+        public static int InstanceNumber
+        {
+            get
+            {
+                return _instanceNumber;
+            }
+            private set
+            {
+                _instanceNumber = value;
+            }
+        }
+
+        public IValidation<T> Create(Func<T, object> value, string? errorMessage = null, IValidation<T>? baseValidation = null)
+        {
+            InstanceNumber++;
+            return new IsTodayValidation<T>(
+                messageOnError: string.IsNullOrEmpty(errorMessage) ? "IsToday validation #" + InstanceNumber + ": This field date is not today" : errorMessage,
+                name: "IsToday validation from factory: " + InstanceNumber,
+                originalValue: value,
+                baseValidation
+            );
+        }
+    }
+
     public class ValidationFactory<T>
     {
         private static int _instanceNumber = 0;
@@ -27,28 +172,6 @@ namespace UrashimaValidation
                 name: "Validation from factory: " + InstanceNumber,
                 originalValue: value,
                 validationFunction: validationFunc
-            );
-        }
-
-        public static IValidation<T> CreateEmailValidation(Func<T, object> value, string? errorMessage = null, IValidation<T>? baseValidation = null)
-        {
-            InstanceNumber++;
-            return new EmailValidation<T>(
-                messageOnError: string.IsNullOrEmpty(errorMessage) ? "Email validation #" + InstanceNumber + ": This field is not an email" : errorMessage,
-                name: "Email validation from factory: " + InstanceNumber,
-                originalValue: value,
-                baseValidation
-            );
-        }
-
-        public static IValidation<T> CreateNotEmptyValidation(Func<T, object> value, string? errorMessage = null, IValidation<T>? baseValidation = null)
-        {
-            InstanceNumber++;
-            return new NotEmptyValidation<T>(
-                messageOnError: string.IsNullOrEmpty(errorMessage) ? "Not empty validation #" + InstanceNumber + ": This field cannot be empty" : errorMessage,
-                name: "Not empty validation from factory: " + InstanceNumber,
-                originalValue: value,
-                baseValidation
             );
         }
 
@@ -124,28 +247,6 @@ namespace UrashimaValidation
             return new IPv4Validation<T>(
                 messageOnError: string.IsNullOrEmpty(errorMessage) ? "IPv4 validation #" + InstanceNumber + ": This field is not an IPv4 Address" : errorMessage,
                 name: "IPv4 validation from factory: " + InstanceNumber,
-                originalValue: value,
-                baseValidation
-            );
-        }
-
-        public static IValidation<T> CreateIPv6Validation(Func<T, object> value, string? errorMessage = null, IValidation<T>? baseValidation = null)
-        {
-            InstanceNumber++;
-            return new IPv6Validation<T>(
-                messageOnError: string.IsNullOrEmpty(errorMessage) ? "IPv6 validation #" + InstanceNumber + ": This field is not an IPv6 Address" : errorMessage,
-                name: "IPv6 validation from factory: " + InstanceNumber,
-                originalValue: value,
-                baseValidation
-            );
-        }
-
-        public static IValidation<T> CreateIsTodayValidation(Func<T, object> value, string? errorMessage = null, IValidation<T>? baseValidation = null)
-        {
-            InstanceNumber++;
-            return new IsTodayValidation<T>(
-                messageOnError: string.IsNullOrEmpty(errorMessage) ? "IsToday validation #" + InstanceNumber + ": This field date is not today" : errorMessage,
-                name: "IsToday validation from factory: " + InstanceNumber,
                 originalValue: value,
                 baseValidation
             );
