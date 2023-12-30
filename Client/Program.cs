@@ -5,16 +5,18 @@ using UrashimaValidation;
 var customer = new Customer();
 
 var validation = ValidationFactory<Customer>.CreateValidation(item => item.Name, (customer) => customer.Name.Length > 6, "Name length must be greater than 6");
+
+#region DECORATOR
 var emailCombineValidation = ValidationFactory<Customer>.CreateNotEmptyValidation(
         item => item.Name,
         baseValidation: validation);
+#endregion
+
 List<IValidation<Customer>> list = new List<IValidation<Customer>>
 {
-    #region DECORATOR
     // pass a base validation to the "Not Empty" validation
     ValidationFactory<Customer>.CreateEmailValidation(item => item.Email, baseValidation: emailCombineValidation),
     ValidationFactory<Customer>.CreateRegexValidation(item => item.Email, pattern: @"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$", errorMessage: "Password is WEAK!")
-    #endregion
 };
 
 Validator<Customer> validator = Validator<Customer>.GetInstance()!
