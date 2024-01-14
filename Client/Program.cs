@@ -7,15 +7,16 @@ var customer = new Customer();
 var validation = ValidationFactory<Customer>.CreateValidation(item => item.Name, (customer) => customer.Name.Length > 6, "Name length must be greater than 6");
 
 #region DECORATOR
-var emailCombineValidation = new NotEmptyValidationFactory<Customer>().Create(
+var notEmptyValidation = new NotEmptyValidationFactory<Customer>().Create(
     item => item.Name,
+    "Name cannot be empty",
     baseValidation: validation);
 #endregion
 
 List<IValidation<Customer>> list = new List<IValidation<Customer>>
 {
     // pass a base validation to the "Not Empty" validation
-    new EmailValidationFactory<Customer>().Create(item => item.Email, baseValidation: emailCombineValidation),
+    new EmailValidationFactory<Customer>().Create(item => item.Email, "Wrong email format", baseValidation: notEmptyValidation),
     ValidationFactory<Customer>.CreateRegexValidation(item => item.Email, pattern: @"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$", errorMessage: "Password is WEAK!")
 };
 
@@ -37,6 +38,7 @@ class Customer
     [Required(ErrorMessage = "Name is required")]
     public string Name { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
+    public string Password { get; set; } = "123456";
     public string Phone { get; set; } = string.Empty;
     [Range(1, 50, ErrorMessage = "Age must be between 1 and 50")]
     public int Age { get; set; } = 0;

@@ -52,29 +52,11 @@ namespace UrashimaValidation
         
         public bool ReturnOnlyErrors { get; set; } = false;
 
-        protected Dictionary<string, bool> Cache { get; set; } = new Dictionary<string, bool>();
-
         public IEnumerable<ValidationResponse> ValidateSingleValue(T value)
         {
             return ValidateWithFilter(
                 value: value,
                 wherePredicate: null);
-        }
-
-        public IEnumerable<ValidationResponse> ValidateWithNameFilter(
-            T value,
-            string? nameFilter = null)
-        {
-            Func<IValidation<T>, bool>? wherePredicate = null;
-
-            if (!string.IsNullOrEmpty(nameFilter))
-            {
-                wherePredicate = (i) => i.Name == nameFilter;
-            }
-
-            return ValidateWithFilter(
-                value: value,
-                wherePredicate: wherePredicate);
         }
 
         public IEnumerable<ValidationResponse> ValidateList(IEnumerable<T> values)
@@ -116,9 +98,6 @@ namespace UrashimaValidation
                 }
             }
         }
-
-        public bool IsAllValid(T value)
-        => ValidationComposite.IsValid(value);
 
         public IEnumerable<ValidationResponse> ValidateSingleValueComposite(T value)
         => ValidationComposite.Validate(value);
